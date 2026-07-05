@@ -8,6 +8,7 @@ export const AIChat = () => {
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -20,9 +21,19 @@ export const AIChat = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
+  useEffect(() => {
+    if (cooldown > 0) {
+      const timer = setTimeout(() => setCooldown(cooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldown]);
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || cooldown > 0) return;
+
+    // Rate Limit Cooldown (3 seconds)
+    setCooldown(3);
 
     const userMessage = { sender: 'USER', message: input, timestamp: new Date().toISOString() };
     setMessages(prev => [...prev, userMessage]);
@@ -45,7 +56,7 @@ export const AIChat = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-6rem)] animate-fade-in-up">
+    <div className="flex flex-col min-h-[calc(100vh-12rem)] animate-fade-in-up">
       {/* Header */}
       <header className="mb-6 flex justify-between items-center shrink-0">
         <div>
@@ -58,8 +69,8 @@ export const AIChat = () => {
       </header>
 
       {/* Chat Container */}
-      <div className="flex-1 glass-panel border border-white/5 rounded-[24px] overflow-hidden flex flex-col relative bg-black/20 shadow-2xl">
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+      <div className="flex-1 glass-panel border border-white/5 rounded-[24px] flex flex-col relative bg-black/20 shadow-2xl pb-0">
+        <div className="flex-1 p-6 space-y-6">
           <AnimatePresence>
             {messages.length === 0 && (
               <motion.div 
@@ -157,19 +168,21 @@ export const AIChat = () => {
         </div>
         
         {/* Footer Input Area */}
-        <div className="p-5 border-t border-white/5 bg-black/40 shrink-0">
+        <div className="p-5 border-t border-white/5 bg-black/80 backdrop-blur-md shrink-0 sticky bottom-0 z-30 rounded-b-[24px]">
           <form onSubmit={handleSend} className="relative flex items-center max-w-4xl mx-auto">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask for interview prep, mock question reviews, coding guidelines..."
-              className="w-full pl-6 pr-14 py-4 bg-zinc-900/80 border border-white/10 rounded-[16px] focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 outline-none transition-all shadow-inner text-[15px] placeholder-zinc-500 text-zinc-100"
-              disabled={loading}
+              placeholder={cooldown > 0 ? `Rate limited. Please wait ${cooldown}s...` : "Ask for interview prep, mock question reviews, coding guidelines..."}
+              className={`w-full pl-6 pr-14 py-4 bg-zinc-900/80 border border-white/10 rounded-[16px] outline-none transition-all shadow-inner text-[15px] text-zinc-100 ${
+                cooldown > 0 ? 'placeholder-rose-500/70 border-rose-500/30 bg-rose-950/10' : 'placeholder-zinc-500 focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50'
+              }`}
+              disabled={loading || cooldown > 0}
             />
             <button
               type="submit"
-              disabled={loading || !input.trim()}
+              disabled={loading || !input.trim() || cooldown > 0}
               className="absolute right-2.5 p-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-[12px] transition-all duration-300 disabled:opacity-30 disabled:hover:bg-purple-600 shadow-[0_0_10px_rgba(139,92,246,0.3)] hover:scale-105 active:scale-95"
             >
               <Send size={18} />

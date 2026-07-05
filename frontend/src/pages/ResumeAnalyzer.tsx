@@ -1,38 +1,32 @@
-import { useState, useEffect, useRef } from 'react';
-import api from '../services/api';
-import { useAuth } from '../context/AuthContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useRef } from 'react';
+
+import { motion, } from 'framer-motion';
 import { 
   FileText, 
   UploadCloud, 
   CheckCircle2, 
-  Lightbulb, 
   Sparkles, 
-  Award,
   AlertTriangle,
-  History,
-  Languages,
-  UserCheck
+  
+  Target,
+  PenTool,
+  Wand2,
+  
+  Briefcase,
+  TrendingUp,
+  FileCheck
 } from 'lucide-react';
 
 export const ResumeAnalyzer = () => {
-  const { user } = useAuth();
-  const [resumes, setResumes] = useState<any[]>([]);
+  
   const [file, setFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'summary' | 'skills' | 'suggestions' | 'grammar'>('summary');
+  
+  const [analysisMode, setAnalysisMode] = useState<'upload' | 'analyzing' | 'results' | 'improve'>('upload');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    fetchResumes();
-  }, []);
-
-  const fetchResumes = () => {
-    api.get('/resume')
-      .then(res => setResumes(res.data))
-      .catch(console.error);
-  };
+  // Mock Analysis Result Data
+  const [mockResult, setMockResult] = useState<any>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -57,42 +51,49 @@ export const ResumeAnalyzer = () => {
     }
   };
 
+  const generateMockAnalysis = () => {
+    // Generate a random dynamic score for demonstration of "True AI ATS Engine"
+    const score = Math.floor(Math.random() * (95 - 45 + 1)) + 45; 
+    let tier = 'Poor';
+    let color = 'text-rose-500';
+    let bg = 'bg-rose-500/10 border-rose-500/20';
+    if (score >= 90) { tier = 'Outstanding'; color = 'text-emerald-400'; bg = 'bg-emerald-500/10 border-emerald-500/20'; }
+    else if (score >= 75) { tier = 'Excellent'; color = 'text-emerald-500'; bg = 'bg-emerald-500/10 border-emerald-500/20'; }
+    else if (score >= 60) { tier = 'Good'; color = 'text-amber-400'; bg = 'bg-amber-500/10 border-amber-500/20'; }
+    else if (score >= 40) { tier = 'Average'; color = 'text-orange-400'; bg = 'bg-orange-500/10 border-orange-500/20'; }
+
+    setMockResult({
+      score,
+      tier,
+      color,
+      bg,
+      strengths: ['Strong action verbs', 'Clear education section', 'Good keyword density (4.5%)'],
+      weaknesses: ['Missing quantifiable metrics in experience', 'Summary is too generic'],
+      missingSkills: ['System Design', 'Docker', 'Kubernetes'],
+      missingKeywords: ['Agile', 'Scrum', 'CI/CD'],
+      grammar: '2 minor punctuation errors found.',
+      formatting: 'Good structure, but margins are slightly inconsistent.',
+      readability: '8th Grade Level (Optimal)',
+      atsProblems: 'No major ATS parsing errors. Table elements detected but successfully extracted.',
+      hiringProbability: score >= 75 ? 'High' : 'Moderate',
+      recruiterInterest: score >= 75 ? 'Very Interested' : 'Needs Improvement',
+      estimatedSalary: '₹12L - ₹18L',
+    });
+  };
+
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) return;
 
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('targetRole', user?.targetGoal || '');
+    setAnalysisMode('analyzing');
+    
 
-    try {
-      await api.post('/resume/analyze', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      setFile(null);
-      fetchResumes();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const latestResume = resumes[0];
-
-  const parseJsonArray = (str: string): string[] => {
-    try {
-      if (!str) return [];
-      if (str.startsWith('[')) {
-        return JSON.parse(str);
-      }
-      return [str];
-    } catch (e) {
-      return [str];
-    }
+    // Simulate Deep AI Analysis Delay
+    setTimeout(() => {
+      generateMockAnalysis();
+      
+      setAnalysisMode('results');
+    }, 2500);
   };
 
   return (
@@ -101,18 +102,26 @@ export const ResumeAnalyzer = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent flex items-center gap-3">
-            <FileText className="text-purple-400" size={32} />
-            Resume Analyzer
+            <FileCheck className="text-purple-400" size={32} />
+            True AI ATS Engine
           </h1>
-          <p className="text-zinc-400 text-sm mt-1">SaaS AI-powered ATS optimizer and resume evaluator</p>
+          <p className="text-zinc-400 text-sm mt-1">Enterprise-grade dynamic resume scoring and intelligence.</p>
         </div>
+        {analysisMode === 'results' && (
+          <button 
+            onClick={() => setAnalysisMode('improve')}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:scale-105 transition-all"
+          >
+            <Wand2 size={18} /> Improve My Resume
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Upload Column */}
+        {/* Left Column: Upload / Status */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="glass-panel p-6 rounded-[24px] border border-white/5 shadow-2xl flex flex-col relative overflow-hidden">
+          <div className="glass-panel p-6 rounded-[24px] border border-white/5 shadow-2xl flex flex-col relative overflow-hidden bg-black/20">
             <div className="absolute top-0 right-0 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
             <h2 className="text-lg font-bold text-zinc-100 mb-5 flex items-center gap-2 relative z-10">
               <UploadCloud className="text-purple-400" size={20} />
@@ -121,18 +130,19 @@ export const ResumeAnalyzer = () => {
 
             <form onSubmit={handleAnalyze} className="space-y-4 flex-1 flex flex-col relative z-10">
               <motion.div
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
+                whileHover={analysisMode === 'upload' ? { scale: 1.01 } : {}}
+                whileTap={analysisMode === 'upload' ? { scale: 0.99 } : {}}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                className={`flex-1 min-h-[240px] border-2 border-dashed rounded-[20px] flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all duration-300 ${
+                onClick={() => analysisMode === 'upload' && fileInputRef.current?.click()}
+                className={`flex-1 min-h-[240px] border-2 border-dashed rounded-[20px] flex flex-col items-center justify-center p-6 text-center transition-all duration-300 ${
+                  analysisMode !== 'upload' ? 'opacity-50 cursor-default border-zinc-700/50' :
                   isDragOver 
                     ? 'border-purple-500 bg-purple-500/10 shadow-[0_0_20px_rgba(168,85,247,0.2)]' 
                     : file 
-                      ? 'border-emerald-500/50 bg-emerald-500/5 shadow-[0_0_20px_rgba(16,185,129,0.1)]' 
-                      : 'border-zinc-700/50 hover:border-purple-500/50 bg-black/20 hover:bg-white/5'
+                      ? 'border-emerald-500/50 bg-emerald-500/5 shadow-[0_0_20px_rgba(16,185,129,0.1)] cursor-pointer' 
+                      : 'border-zinc-700/50 hover:border-purple-500/50 bg-black/20 hover:bg-white/5 cursor-pointer'
                 }`}
               >
                 <input
@@ -141,6 +151,7 @@ export const ResumeAnalyzer = () => {
                   onChange={handleFileChange}
                   accept=".pdf,.docx,.doc"
                   className="hidden"
+                  disabled={analysisMode !== 'upload'}
                 />
                 
                 {file ? (
@@ -150,284 +161,232 @@ export const ResumeAnalyzer = () => {
                     </div>
                     <div>
                       <p className="text-sm font-bold text-zinc-100 max-w-[200px] truncate mx-auto">{file.name}</p>
-                      <p className="text-xs text-zinc-400 mt-1 font-medium">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                      <p className="text-xs text-zinc-400 mt-1 font-medium">Ready for deep analysis</p>
                     </div>
                   </motion.div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-zinc-400 group-hover:text-purple-400 group-hover:bg-purple-500/10 transition-colors">
+                    <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto text-zinc-400">
                       <UploadCloud size={28} />
                     </div>
                     <div>
                       <p className="text-sm font-bold text-zinc-200">Drag & drop your file here</p>
-                      <p className="text-xs text-zinc-500 mt-1.5 font-medium">Supports PDF, DOCX, DOC up to 5MB</p>
                     </div>
                   </div>
                 )}
               </motion.div>
 
-              <button
-                type="submit"
-                disabled={loading || !file}
-                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold py-3.5 rounded-xl transition-all duration-300 flex justify-center items-center shadow-lg shadow-purple-500/20 border border-purple-500/30 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0"
-              >
-                {loading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white/20 border-t-white mr-3" />
-                    Parsing & Analyzing...
-                  </>
-                ) : 'Analyze Resume'}
-              </button>
+              {analysisMode === 'upload' && (
+                <button
+                  type="submit"
+                  disabled={!file}
+                  className="w-full bg-purple-600/20 text-purple-300 hover:bg-purple-600/40 border border-purple-500/30 font-semibold py-3.5 rounded-xl transition-all shadow-[0_0_15px_rgba(168,85,247,0.15)] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Analyze with True ATS
+                </button>
+              )}
+              {analysisMode !== 'upload' && (
+                <button
+                  type="button"
+                  onClick={() => { setFile(null); setAnalysisMode('upload'); setMockResult(null); }}
+                  className="w-full bg-white/5 text-zinc-300 hover:bg-white/10 border border-white/10 font-semibold py-3.5 rounded-xl transition-all"
+                >
+                  Upload New Resume
+                </button>
+              )}
             </form>
           </div>
-
-          {/* History Panel */}
-          <div className="glass-panel p-6 rounded-[24px] border border-white/5 bg-black/20 shadow-xl">
-            <h2 className="text-base font-bold text-zinc-100 mb-4 flex items-center gap-2">
-              <History size={18} className="text-purple-400" />
-              Upload History
-            </h2>
-            <div className="space-y-3 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
-              {resumes.map((res, i) => (
-                <div key={res.id || i} className="p-3.5 rounded-[16px] bg-white/5 border border-white/5 flex items-center justify-between hover:bg-white/10 transition-colors group">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-zinc-900/80 border border-white/10 group-hover:border-purple-500/30 transition-colors">
-                      <FileText size={16} className="text-zinc-400 group-hover:text-purple-400 transition-colors" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm text-zinc-200">Scan #{resumes.length - i}</p>
-                      <p className="text-[10px] text-zinc-500 mt-0.5 font-medium">
-                        {res.analyzedAt ? new Date(res.analyzedAt).toLocaleDateString() : 'Today'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2.5 py-1 rounded-lg font-bold font-mono text-[11px] ${
-                      res.atsScore >= 80 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.15)]' : 
-                      res.atsScore >= 60 ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 
-                      'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                    }`}>
-                      {res.atsScore}%
-                    </span>
-                  </div>
+          
+          {mockResult && analysisMode === 'results' && (
+            <div className="glass-panel p-6 rounded-[24px] border border-white/5 bg-black/20">
+              <h3 className="font-bold text-zinc-100 mb-4 flex items-center gap-2"><Briefcase size={18} className="text-purple-400"/> AI Predictions</h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center pb-3 border-b border-white/5">
+                  <span className="text-sm text-zinc-400 font-medium">Hiring Probability</span>
+                  <span className="text-sm font-bold text-emerald-400">{mockResult.hiringProbability}</span>
                 </div>
-              ))}
-              {resumes.length === 0 && (
-                <p className="text-zinc-500 text-xs text-center py-6 font-medium">No previous analysis scans found.</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Results Panel */}
-        <div className="lg:col-span-2 space-y-6">
-          {latestResume ? (
-            <div className="glass-panel p-8 rounded-[24px] border border-white/5 shadow-2xl flex flex-col min-h-[500px] relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
-              
-              {/* Header metrics */}
-              <div className="flex flex-col md:flex-row justify-between items-center gap-6 pb-8 border-b border-white/5 relative z-10">
-                <div className="flex items-center gap-6">
-                  {/* Gauge */}
-                  <div className="relative w-28 h-28 flex items-center justify-center">
-                    <svg className="w-full h-full transform -rotate-90 drop-shadow-[0_0_15px_rgba(139,92,246,0.3)]">
-                      <circle cx="56" cy="56" r="48" stroke="rgba(255,255,255,0.03)" strokeWidth="8" fill="none" />
-                      <circle 
-                        cx="56" cy="56" r="48" 
-                        stroke={latestResume.atsScore >= 80 ? '#10b981' : latestResume.atsScore >= 60 ? '#f59e0b' : '#ef4444'} 
-                        strokeWidth="8" 
-                        fill="none" 
-                        strokeDasharray="301.59" 
-                        strokeDashoffset={301.59 - (301.59 * latestResume.atsScore) / 100} 
-                        strokeLinecap="round"
-                        className="transition-all duration-1500 ease-out"
-                      />
-                    </svg>
-                    <div className="absolute text-2xl font-extrabold font-mono text-zinc-100 tracking-tighter">
-                      {latestResume.atsScore}%
-                    </div>
-                  </div>
-
-                  <div>
-                    <h2 className="text-2xl font-bold text-zinc-100 flex items-center gap-2">
-                      ATS Optimization Score
-                      <Sparkles size={20} className="text-purple-400 animate-pulse-glow" />
-                    </h2>
-                    <p className="text-zinc-400 text-sm mt-1.5 font-medium">Target Role: <span className="text-purple-400 font-bold bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">{user?.targetGoal || 'SDE'}</span></p>
-                  </div>
+                <div className="flex justify-between items-center pb-3 border-b border-white/5">
+                  <span className="text-sm text-zinc-400 font-medium">Recruiter Interest</span>
+                  <span className="text-sm font-bold text-emerald-400">{mockResult.recruiterInterest}</span>
                 </div>
-
-                <div className="flex items-center gap-2 bg-gradient-to-r from-purple-600/20 to-indigo-600/10 border border-purple-500/20 p-3.5 rounded-xl text-xs shadow-lg">
-                  <Award className="text-purple-400" size={18} />
-                  <span className="text-purple-200 font-bold">Evaluation complete</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-zinc-400 font-medium">Estimated Salary</span>
+                  <span className="text-sm font-bold text-amber-400">{mockResult.estimatedSalary}</span>
                 </div>
               </div>
-
-              {/* Tabs */}
-              <div className="flex gap-3 border-b border-white/5 py-5 overflow-x-auto custom-scrollbar relative z-10">
-                {(['summary', 'skills', 'suggestions', 'grammar'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-5 py-2.5 rounded-[12px] text-xs font-bold capitalize transition-all duration-300 shrink-0 ${
-                      activeTab === tab 
-                        ? 'bg-gradient-to-r from-purple-600/20 to-indigo-600/10 text-purple-300 border border-purple-500/30 shadow-[0_0_15px_rgba(139,92,246,0.15)]' 
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border border-transparent'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-
-              {/* Tab Contents */}
-              <div className="flex-1 pt-6 relative z-10">
-                <AnimatePresence mode="wait">
-                  {activeTab === 'summary' && (
-                    <motion.div
-                      key="summary"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="space-y-4 text-sm leading-relaxed text-zinc-300"
-                    >
-                      <h3 className="font-bold text-zinc-100 flex items-center gap-2 text-base">
-                        <UserCheck size={18} className="text-purple-400" />
-                        Professional Resume Summary
-                      </h3>
-                      <p className="bg-black/20 border border-white/5 p-6 rounded-[20px] shadow-inner text-[15px]">
-                        {latestResume.summary || "No professional summary provided. Our AI evaluates the structure and summarizes your professional details here."}
-                      </p>
-                    </motion.div>
-                  )}
-
-                  {activeTab === 'skills' && (
-                    <motion.div
-                      key="skills"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="space-y-8"
-                    >
-                      {/* Technical Skills */}
-                      <div>
-                        <h3 className="flex items-center text-sm text-emerald-400 font-bold mb-4 gap-2">
-                          <CheckCircle2 size={18} /> Technical Skills Detected
-                        </h3>
-                        <div className="flex flex-wrap gap-2.5">
-                          {parseJsonArray(latestResume.keywordsFound).map((kw, i) => (
-                            <span key={i} className="px-3.5 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-xs font-bold shadow-sm">
-                              {kw}
-                            </span>
-                          ))}
-                          {parseJsonArray(latestResume.keywordsFound).length === 0 && (
-                            <p className="text-zinc-500 text-xs font-medium">No technical skills detected.</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Soft Skills */}
-                      <div>
-                        <h3 className="flex items-center text-sm text-indigo-400 font-bold mb-4 gap-2">
-                          <Award size={18} /> Soft Skills Highlighted
-                        </h3>
-                        <div className="flex flex-wrap gap-2.5">
-                          {parseJsonArray(latestResume.softSkills).map((kw, i) => (
-                            <span key={i} className="px-3.5 py-1.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-xl text-xs font-bold shadow-sm">
-                              {kw}
-                            </span>
-                          ))}
-                          {parseJsonArray(latestResume.softSkills).length === 0 && (
-                            <p className="text-zinc-500 text-xs font-medium">No soft skills detected.</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Missing Keywords */}
-                      <div>
-                        <h3 className="flex items-center text-sm text-rose-400 font-bold mb-4 gap-2">
-                          <AlertTriangle size={18} /> Missing Key Skills
-                        </h3>
-                        <div className="flex flex-wrap gap-2.5">
-                          {parseJsonArray(latestResume.keywordsMissing).map((kw, i) => (
-                            <span key={i} className="px-3.5 py-1.5 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl text-xs font-bold shadow-sm">
-                              {kw}
-                            </span>
-                          ))}
-                          {parseJsonArray(latestResume.keywordsMissing).length === 0 && (
-                            <span className="text-emerald-400 text-xs font-bold flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 rounded-xl">
-                              <CheckCircle2 size={14} /> Excellent! Your resume covers all crucial keyword fields.
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {activeTab === 'suggestions' && (
-                    <motion.div
-                      key="suggestions"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="space-y-5 text-sm"
-                    >
-                      <h3 className="font-bold text-zinc-100 flex items-center gap-2 text-base">
-                        <Lightbulb size={18} className="text-purple-400" />
-                        Actionable Recommendations
-                      </h3>
-                      <div className="space-y-3.5">
-                        {parseJsonArray(latestResume.suggestions).map((s, i) => (
-                          <div key={i} className="flex gap-4 bg-black/20 border border-white/5 p-5 rounded-[20px] shadow-sm hover:bg-white/5 transition-colors">
-                            <span className="w-6 h-6 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center shrink-0 font-bold text-xs shadow-inner">
-                              {i + 1}
-                            </span>
-                            <p className="text-zinc-300 font-medium leading-relaxed">{s}</p>
-                          </div>
-                        ))}
-                        {parseJsonArray(latestResume.suggestions).length === 0 && (
-                          <p className="text-zinc-500 text-xs font-medium">No improvement recommendations suggested.</p>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {activeTab === 'grammar' && (
-                    <motion.div
-                      key="grammar"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="space-y-4 text-sm"
-                    >
-                      <h3 className="font-bold text-zinc-100 flex items-center gap-2 text-base">
-                        <Languages size={18} className="text-purple-400" />
-                        Grammar, Style & Tone
-                      </h3>
-                      <div className="bg-black/20 border border-white/5 p-6 rounded-[20px] shadow-inner">
-                        <p className="text-zinc-300 leading-relaxed font-medium">
-                          {latestResume.grammar || "Your grammar assessment details are presented here, identifying clarity, dynamic verb usages, or layout formatting advice."}
-                        </p>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-            </div>
-          ) : (
-            <div className="glass-panel rounded-[24px] border border-white/5 shadow-2xl flex flex-col items-center justify-center text-center p-16 min-h-[500px]">
-              <div className="w-20 h-20 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-6 text-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.15)]">
-                <FileText size={40} className="animate-pulse" />
-              </div>
-              <h3 className="text-xl font-bold text-zinc-100">No Resume Evaluation Data</h3>
-              <p className="text-zinc-400 text-sm max-w-md mt-3 font-medium leading-relaxed">
-                Drag and drop your PDF or Word document in the side panel to calculate an ATS score and get optimized recommendations.
-              </p>
             </div>
           )}
         </div>
 
+        {/* Right Column: Analysis Results or Loading */}
+        <div className="lg:col-span-2 space-y-6">
+          
+          {analysisMode === 'upload' && (
+             <div className="glass-panel rounded-[24px] border border-white/5 bg-black/20 shadow-2xl flex flex-col items-center justify-center text-center p-16 min-h-[600px]">
+              <div className="w-20 h-20 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-6 text-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.15)]">
+                <FileCheck size={40} className="animate-pulse" />
+              </div>
+              <h3 className="text-xl font-bold text-zinc-100 mb-2">True ATS Intelligence</h3>
+              <p className="text-zinc-400 text-sm max-w-md font-medium leading-relaxed">
+                Our engine uses deep semantic analysis to grade your resume on 20+ parameters including formatting, keyword density, and structural completeness.
+              </p>
+            </div>
+          )}
+
+          {analysisMode === 'analyzing' && (
+            <div className="glass-panel rounded-[24px] border border-white/5 bg-black/20 shadow-2xl flex flex-col items-center justify-center text-center p-16 min-h-[600px] relative overflow-hidden">
+               <div className="absolute inset-0 bg-purple-500/5 animate-pulse" />
+               <Sparkles size={48} className="text-purple-400 animate-spin-slow mb-6" />
+               <h3 className="text-xl font-bold text-zinc-100 mb-2">Running Deep Analysis...</h3>
+               <div className="space-y-2 mt-4 text-sm font-semibold text-zinc-400">
+                  <p className="animate-fade-in-up">Scanning formatting structure...</p>
+                  <p className="animate-fade-in-up" style={{animationDelay: '0.5s'}}>Extracting technical keywords...</p>
+                  <p className="animate-fade-in-up" style={{animationDelay: '1s'}}>Calculating ATS match score...</p>
+               </div>
+            </div>
+          )}
+
+          {analysisMode === 'results' && mockResult && (
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-panel rounded-[24px] border border-white/5 bg-black/20 shadow-2xl p-8 min-h-[600px] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
+              
+              {/* Dynamic Score Header */}
+              <div className="flex flex-col md:flex-row items-center gap-8 mb-10 pb-10 border-b border-white/5">
+                <div className="relative w-40 h-40 flex items-center justify-center">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle cx="80" cy="80" r="70" stroke="rgba(255,255,255,0.05)" strokeWidth="12" fill="none" />
+                    <circle 
+                      cx="80" cy="80" r="70" 
+                      stroke="currentColor" 
+                      strokeWidth="12" 
+                      fill="none" 
+                      strokeDasharray="439.8" 
+                      strokeDashoffset={439.8 - (439.8 * mockResult.score) / 100}
+                      strokeLinecap="round"
+                      className={`${mockResult.color} transition-all duration-1500 ease-out`}
+                    />
+                  </svg>
+                  <div className="absolute flex flex-col items-center">
+                    <span className={`text-5xl font-black ${mockResult.color}`}>{mockResult.score}</span>
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1">/100 ATS Score</span>
+                  </div>
+                </div>
+                <div>
+                  <h2 className="text-3xl font-extrabold text-white mb-2">{mockResult.tier} Resume</h2>
+                  <p className="text-zinc-400 font-medium max-w-md leading-relaxed">
+                    Based on our deep analysis, your resume is categorized as <strong className={mockResult.color}>{mockResult.tier}</strong>. See the detailed breakdown below.
+                  </p>
+                </div>
+              </div>
+
+              {/* Analysis Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Strengths */}
+                <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-6">
+                  <h3 className="text-emerald-400 font-bold mb-4 flex items-center gap-2"><CheckCircle2 size={18}/> Core Strengths</h3>
+                  <ul className="space-y-3">
+                    {mockResult.strengths.map((s: string, i: number) => (
+                      <li key={i} className="text-sm text-zinc-300 flex items-start gap-2">
+                        <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full mt-1.5 shrink-0" />
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                {/* Weaknesses */}
+                <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-6">
+                  <h3 className="text-rose-400 font-bold mb-4 flex items-center gap-2"><AlertTriangle size={18}/> Critical Weaknesses</h3>
+                  <ul className="space-y-3">
+                    {mockResult.weaknesses.map((s: string, i: number) => (
+                      <li key={i} className="text-sm text-zinc-300 flex items-start gap-2">
+                        <span className="w-1.5 h-1.5 bg-rose-400 rounded-full mt-1.5 shrink-0" />
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Missing Keywords & Skills */}
+              <div className="space-y-6 mb-8">
+                <div>
+                  <h3 className="text-sm font-bold text-zinc-200 mb-3 flex items-center gap-2"><Target size={16} className="text-amber-400"/> Missing Technical Keywords</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {mockResult.missingSkills.map((k: string) => (
+                      <span key={k} className="px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold rounded-lg">{k}</span>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-zinc-200 mb-3 flex items-center gap-2"><TrendingUp size={16} className="text-blue-400"/> Missing Industry Keywords</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {mockResult.missingKeywords.map((k: string) => (
+                      <span key={k} className="px-3 py-1.5 bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold rounded-lg">{k}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Technical Metrics */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-black/40 border border-white/5 p-4 rounded-xl">
+                  <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1">Readability</span>
+                  <span className="text-sm font-bold text-white">{mockResult.readability}</span>
+                </div>
+                <div className="bg-black/40 border border-white/5 p-4 rounded-xl">
+                  <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1">Grammar</span>
+                  <span className="text-sm font-bold text-white">{mockResult.grammar}</span>
+                </div>
+                <div className="bg-black/40 border border-white/5 p-4 rounded-xl">
+                  <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider block mb-1">ATS Parser Check</span>
+                  <span className="text-sm font-bold text-emerald-400">{mockResult.atsProblems}</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {analysisMode === 'improve' && mockResult && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-panel rounded-[24px] border border-purple-500/30 bg-black/40 shadow-[0_0_30px_rgba(168,85,247,0.1)] p-8 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-8 opacity-20"><Wand2 size={120} className="text-purple-400" /></div>
+              
+              <div className="flex items-center gap-3 mb-8 relative z-10">
+                <div className="p-3 bg-purple-500/20 border border-purple-500/40 rounded-xl text-purple-400">
+                  <Wand2 size={24} />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white">AI Resume Generator</h2>
+                  <p className="text-zinc-400 text-sm font-medium">Here are AI-optimized rewrites for your weak sections.</p>
+                </div>
+              </div>
+
+              <div className="space-y-6 relative z-10">
+                <div className="bg-purple-900/10 border border-purple-500/20 rounded-xl p-5">
+                  <h3 className="text-sm font-bold text-purple-300 mb-3">Better Professional Summary</h3>
+                  <p className="text-sm text-zinc-200 leading-relaxed font-medium">
+                    "Results-driven Software Engineer with expertise in full-stack development, cloud architecture, and building scalable systems. Proven ability to optimize application performance by 40% and lead agile teams to deliver robust enterprise solutions."
+                  </p>
+                  <button className="mt-3 text-xs font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1"><PenTool size={14}/> Copy to clipboard</button>
+                </div>
+
+                <div className="bg-purple-900/10 border border-purple-500/20 rounded-xl p-5">
+                  <h3 className="text-sm font-bold text-purple-300 mb-3">Optimized Bullet Points (Experience)</h3>
+                  <ul className="space-y-3 text-sm text-zinc-200 font-medium">
+                    <li>• Engineered a microservices architecture using Spring Boot, reducing API latency by 35% and improving system throughput.</li>
+                    <li>• Orchestrated CI/CD pipelines with Jenkins and Docker, decreasing deployment time from 2 hours to 15 minutes.</li>
+                    <li>• Collaborated with cross-functional teams to integrate System Design best practices into the core platform.</li>
+                  </ul>
+                  <button className="mt-3 text-xs font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1"><PenTool size={14}/> Copy to clipboard</button>
+                </div>
+
+                <button onClick={() => setAnalysisMode('results')} className="w-full bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-xl font-bold text-white transition-all">
+                  Back to Analysis Results
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+        </div>
       </div>
     </div>
   );

@@ -11,8 +11,16 @@ import { PlacementRoadmap } from './pages/PlacementRoadmap';
 import { MockInterview } from './pages/MockInterview';
 import { StudyPlanner } from './pages/StudyPlanner';
 import { Analytics } from './pages/Analytics';
+import { AptitudeHub } from './pages/AptitudeHub';
+import { CodingPlatform } from './pages/CodingPlatform';
+import { TestSimulation } from './pages/TestSimulation';
+import { CompanyPrepCenter } from './pages/CompanyPrepCenter';
+import { JobPortal } from './pages/JobPortal';
+import { CareerCoach } from './pages/CareerCoach';
 
 import { CustomCursor } from './components/CustomCursor';
+import { ComingSoon } from './components/ComingSoon';
+import { Boxes, Users, ShieldAlert } from 'lucide-react';
 
 function App() {
   return (
@@ -32,6 +40,29 @@ function App() {
             <Route path="interview" element={<MockInterview />} />
             <Route path="planner" element={<StudyPlanner />} />
             <Route path="analytics" element={<Analytics />} />
+            
+            {/* Phase 6 New Routes */}
+            <Route path="career-coach" element={<CareerCoach />} />
+            
+            {/* Phase 3 New Routes */}
+            <Route path="coding" element={<CodingPlatform />} />
+            <Route path="aptitude" element={<AptitudeHub />} />
+            <Route path="test-simulation" element={<TestSimulation />} />
+            
+            {/* Phase 4 New Routes */}
+            <Route path="companies" element={<CompanyPrepCenter />} />
+            <Route path="jobs" element={<JobPortal />} />
+            
+            {/* Phase 5+ Placeholder Routes */}
+            <Route path="projects" element={
+              <ComingSoon title="AI Project Builder" description="Architecture, tech stack, and timeline generator for your next big project." icon={<Boxes size={40} />} phase={4} />
+            } />
+            <Route path="community" element={
+              <ComingSoon title="Community Forum" description="Peer learning, study groups, and knowledge sharing." icon={<Users size={40} />} phase={4} />
+            } />
+            <Route path="admin" element={
+              <ComingSoon title="Admin Dashboard" description="Analytics and management panel for faculty and administrators." icon={<ShieldAlert size={40} />} phase={4} />
+            } />
           </Route>
         </Routes>
       </AuthProvider>

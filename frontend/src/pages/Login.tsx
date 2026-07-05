@@ -44,7 +44,7 @@ export const Login = () => {
         <div>
           <h1 className="text-xl font-bold bg-gradient-to-r from-violet-400 via-purple-500 to-indigo-500 bg-clip-text text-transparent tracking-tight flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse-glow" />
-            PlacementPro <span className="text-xs px-1.5 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 font-mono">AI</span>
+            TalentBridge <span className="text-xs px-1.5 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 font-mono">AI</span>
           </h1>
         </div>
 
@@ -66,7 +66,7 @@ export const Login = () => {
         </div>
 
         <div className="text-zinc-600 text-xs font-mono">
-          © 2026 PLACEMENTPRO AI. ALL RIGHTS RESERVED.
+          © 2026 TALENTBRIDGE AI. ALL RIGHTS RESERVED.
         </div>
       </div>
 
@@ -81,8 +81,12 @@ export const Login = () => {
           <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 pointer-events-none" />
           
           <div className="mb-8 relative z-10">
-            <h2 className="text-3xl font-extrabold text-zinc-100 tracking-tight">Sign In</h2>
-            <p className="text-zinc-400 text-sm mt-1.5">Enter your credentials to access your account</p>
+            <h2 className="text-3xl font-extrabold text-zinc-100 tracking-tight">
+              Sign In
+            </h2>
+            <p className="text-zinc-400 text-sm mt-1.5">
+              Enter your credentials to access your account
+            </p>
           </div>
 
           {error && (
@@ -132,18 +136,19 @@ export const Login = () => {
             </div>
 
             {/* Remember Me */}
-            <div className="flex items-center">
-              <input
-                id="remember_me"
-                name="remember_me"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 rounded bg-zinc-900 border-white/10 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-0"
-              />
-              <label htmlFor="remember_me" className="ml-2 block text-xs text-zinc-400 font-medium">
-                Remember me
-              </label>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember_me"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 rounded bg-zinc-900 border-white/10 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-0"
+                />
+                <label htmlFor="remember_me" className="ml-2 block text-xs text-zinc-400 font-medium">
+                  Remember me
+                </label>
+              </div>
             </div>
 
             <button
@@ -151,7 +156,7 @@ export const Login = () => {
               disabled={loading}
               className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold py-3.5 rounded-xl transition-all duration-200 flex justify-center items-center shadow-lg shadow-purple-500/10 border border-purple-500/20 disabled:opacity-50"
             >
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Authenticating...' : 'Sign In'}
             </button>
           </form>
 

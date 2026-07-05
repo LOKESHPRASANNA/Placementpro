@@ -21,6 +21,20 @@ export const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const getPasswordStrength = (pass: string) => {
+    let score = 0;
+    if (pass.length > 0) score += 1;
+    if (pass.length >= 8) score += 1;
+    if (/[A-Z]/.test(pass)) score += 1;
+    if (/[0-9]/.test(pass)) score += 1;
+    if (/[^A-Za-z0-9]/.test(pass)) score += 1;
+    return score; // 0 to 5
+  };
+  
+  const strengthScore = getPasswordStrength(formData.password);
+  const strengthLabels = ["Weak", "Fair", "Good", "Strong", "Excellent"];
+  const strengthColors = ["bg-rose-500", "bg-rose-400", "bg-amber-400", "bg-emerald-400", "bg-emerald-500"];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -52,7 +66,7 @@ export const Register = () => {
         <div>
           <h1 className="text-xl font-bold bg-gradient-to-r from-violet-400 via-purple-500 to-indigo-500 bg-clip-text text-transparent tracking-tight flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse-glow" />
-            PlacementPro <span className="text-xs px-1.5 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 font-mono">AI</span>
+            TalentBridge <span className="text-xs px-1.5 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 font-mono">AI</span>
           </h1>
         </div>
 
@@ -74,7 +88,7 @@ export const Register = () => {
         </div>
 
         <div className="text-zinc-600 text-xs font-mono">
-          © 2026 PLACEMENTPRO AI. ALL RIGHTS RESERVED.
+          © 2026 TALENTBRIDGE AI. ALL RIGHTS RESERVED.
         </div>
       </div>
 
@@ -154,6 +168,30 @@ export const Register = () => {
                   required
                 />
               </div>
+              
+              {/* Password Strength Indicator */}
+              {formData.password.length > 0 && (
+                <div className="mt-3">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-zinc-500">Password Strength</span>
+                    <span className={`text-[10px] uppercase tracking-wider font-bold ${
+                      strengthScore <= 2 ? 'text-rose-400' : strengthScore === 3 ? 'text-amber-400' : 'text-emerald-400'
+                    }`}>
+                      {strengthLabels[strengthScore - 1] || "Weak"}
+                    </span>
+                  </div>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((level) => (
+                      <div 
+                        key={level} 
+                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                          level <= strengthScore ? strengthColors[strengthScore - 1] : 'bg-white/10'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">

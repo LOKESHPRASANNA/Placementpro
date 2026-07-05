@@ -8,7 +8,15 @@ import {
   Video, 
   Calendar, 
   BarChart, 
-  LogOut
+  LogOut,
+  Compass,
+  Code2,
+  Target,
+  Building2,
+  Briefcase,
+  Boxes,
+  Users,
+  ShieldAlert
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -16,15 +24,46 @@ export const Layout = () => {
   const { logout, user } = useAuth();
   const location = useLocation();
 
-  const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { name: 'AI Chat', path: '/chat', icon: MessageSquare },
-    { name: 'Resume Analyzer', path: '/resume', icon: FileText },
-    { name: 'Roadmap', path: '/roadmap', icon: Map },
-    { name: 'Mock Interview', path: '/interview', icon: Video },
-    { name: 'Study Planner', path: '/planner', icon: Calendar },
-    { name: 'Analytics', path: '/analytics', icon: BarChart },
+  const navCategories = [
+    {
+      title: 'Core Tools',
+      items: [
+        { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+        { name: 'AI Mentor', path: '/chat', icon: MessageSquare },
+        { name: 'Resume Analyzer', path: '/resume', icon: FileText },
+        { name: 'Mock Interview', path: '/interview', icon: Video },
+      ]
+    },
+    {
+      title: 'Learning & Prep',
+      items: [
+        { name: 'Study Planner', path: '/planner', icon: Calendar },
+        { name: 'Career Coach', path: '/career-coach', icon: Compass },
+        { name: 'Career Roadmap', path: '/roadmap', icon: Map },
+        { name: 'Coding Platform', path: '/coding', icon: Code2 },
+        { name: 'Aptitude Hub', path: '/aptitude', icon: Target },
+        { name: 'Company Prep', path: '/companies', icon: Building2 },
+      ]
+    },
+    {
+      title: 'Career & Ecosystem',
+      items: [
+        { name: 'Job Portal', path: '/jobs', icon: Briefcase },
+        { name: 'Project Builder', path: '/projects', icon: Boxes },
+        { name: 'Community', path: '/community', icon: Users },
+      ]
+    },
+    {
+      title: 'Insights & Admin',
+      items: [
+        { name: 'Analytics', path: '/analytics', icon: BarChart },
+        { name: 'Admin Panel', path: '/admin', icon: ShieldAlert },
+      ]
+    }
   ];
+
+  // Flatten for header title matching
+  const allNavItems = navCategories.flatMap(c => c.items);
 
   const getPageBackgrounds = () => {
     let bgImage = '/images/dashboard_bg.png';
@@ -69,51 +108,60 @@ export const Layout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-[#09090b] text-[#f4f4f5] w-full overflow-hidden font-sans relative bg-grid">
+    <div className="flex min-h-screen bg-[#09090b] text-[#f4f4f5] w-full font-sans relative bg-grid">
       {/* Background Decorative glow */}
       {getPageBackgrounds()}
 
       {/* Sidebar */}
-      <div className="w-72 glass-panel flex flex-col justify-between relative z-10 my-4 ml-4 rounded-[20px] shadow-2xl border-white/5 overflow-hidden">
+      <div className="w-72 glass-panel flex flex-col justify-between fixed inset-y-0 left-0 z-40 my-4 ml-4 rounded-[20px] shadow-2xl border-white/5 overflow-hidden">
         <div>
           {/* Logo Header */}
           <div className="p-6">
             <h1 className="text-2xl font-extrabold bg-gradient-to-r from-violet-400 via-purple-500 to-indigo-500 bg-clip-text text-transparent tracking-tight flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse-glow" />
-              PlacementPro <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 font-mono tracking-widest uppercase mt-1">AI</span>
+              TalentBridge <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 font-mono tracking-widest uppercase mt-1">AI</span>
             </h1>
           </div>
           
-          {/* Nav Items */}
-          <nav className="mt-4 px-4 space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-              return (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="relative flex items-center justify-between group"
-                >
-                  <div
-                    className={`flex items-center space-x-3 px-4 py-3.5 rounded-[16px] w-full transition-all duration-300 ${
-                      isActive 
-                        ? 'bg-gradient-to-r from-purple-600/20 to-indigo-600/10 text-purple-300 border border-purple-500/30 shadow-[0_0_15px_rgba(139,92,246,0.1)]' 
-                        : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/5 border border-transparent'
-                    }`}
-                  >
-                    <Icon size={18} className={isActive ? 'text-purple-400' : 'text-zinc-500 group-hover:text-zinc-300 transition-colors'} />
-                    <span className="font-medium text-[15px]">{item.name}</span>
-                  </div>
-                  {isActive && (
-                    <motion.div 
-                      layoutId="activeIndicator"
-                      className="absolute right-3 w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_10px_rgba(139,92,246,0.8)]"
-                    />
-                  )}
-                </Link>
-              );
-            })}
+          {/* Nav Items - Scrollable Area */}
+          <nav className="mt-4 px-4 space-y-6 overflow-y-auto flex-1 pb-4" style={{ maxHeight: 'calc(100vh - 180px)' }}>
+            {navCategories.map((category, idx) => (
+              <div key={idx}>
+                <h3 className="px-4 text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-3">
+                  {category.title}
+                </h3>
+                <div className="space-y-1.5">
+                  {category.items.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.path;
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className="relative flex items-center justify-between group"
+                      >
+                        <div
+                          className={`flex items-center space-x-3 px-4 py-3 rounded-[14px] w-full transition-all duration-300 ${
+                            isActive 
+                              ? 'bg-gradient-to-r from-purple-600/20 to-indigo-600/10 text-purple-300 border border-purple-500/30 shadow-[0_0_15px_rgba(139,92,246,0.1)]' 
+                              : 'text-zinc-400 hover:text-zinc-100 hover:bg-white/5 border border-transparent'
+                          }`}
+                        >
+                          <Icon size={18} className={isActive ? 'text-purple-400' : 'text-zinc-500 group-hover:text-zinc-300 transition-colors'} />
+                          <span className="font-medium text-[14px]">{item.name}</span>
+                        </div>
+                        {isActive && (
+                          <motion.div 
+                            layoutId="activeIndicator"
+                            className="absolute right-3 w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_10px_rgba(139,92,246,0.8)]"
+                          />
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
         </div>
         
@@ -140,12 +188,12 @@ export const Layout = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden relative z-10 pl-2">
+      <div className="flex-1 flex flex-col min-w-0 relative z-10 ml-[20rem] pr-2">
         {/* Top Navigation Bar */}
-        <header className="h-20 flex items-center justify-between px-8 mt-4 mx-4 rounded-[20px] glass-panel border border-white/5 shadow-lg">
+        <header className="h-20 flex items-center justify-between px-8 mt-4 mx-4 rounded-[20px] glass-panel border border-white/5 shadow-lg shrink-0">
           <div className="flex flex-col">
             <h2 className="text-xl font-semibold text-white tracking-tight">
-              {location.pathname === '/dashboard' ? `Welcome back, ${user?.name?.split(' ')[0] || 'User'} 👋` : navItems.find(i => i.path === location.pathname)?.name}
+              {location.pathname === '/dashboard' ? `Welcome back, ${user?.name?.split(' ')[0] || 'User'} 👋` : allNavItems.find(i => i.path === location.pathname)?.name || 'TalentBridge AI'}
             </h2>
             <p className="text-xs text-zinc-400 mt-0.5 font-medium">
               {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
@@ -167,12 +215,12 @@ export const Layout = () => {
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 mt-2 custom-scrollbar">
+        <div className="p-6 mt-2">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="max-w-7xl mx-auto h-full pb-10"
+            className="max-w-7xl mx-auto w-full pb-10"
           >
             <Outlet />
           </motion.div>

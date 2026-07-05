@@ -1,6 +1,6 @@
-# PlacementPro AI - Career & Placement Prep Engine
+# TalentBridge AI - Career & Placement Prep Engine
 
-PlacementPro AI is a comprehensive career preparation platform leveraging Google Gemini AI. The platform provides automated resume parsing and ATS scoring, interactive study schedules, progress analytics, visual roadmap generation, and mock interview simulations.
+TalentBridge AI is a comprehensive career preparation platform leveraging Google Gemini AI. The platform provides automated resume parsing and ATS scoring, interactive study schedules, progress analytics, visual roadmap generation, and mock interview simulations.
 
 ---
 
